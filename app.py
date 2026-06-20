@@ -36,6 +36,12 @@ def parse_guess(raw: str):
     return True, value, None
 
 
+def reset_game_state():
+    st.session_state.attempts = 0
+    st.session_state.secret = random.randint(1, 100)
+    st.session_state.status = "playing"  # FIX: reset game status so new game accepts guesses
+
+
 def update_score(current_score: int, outcome: str, attempt_number: int):
     if outcome == "Win":
         points = 100 - 10 * (attempt_number + 1)
@@ -127,8 +133,7 @@ with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
 if new_game:
-    st.session_state.attempts = 0
-    st.session_state.secret = random.randint(1, 100)
+    reset_game_state()
     st.success("New game started.")
     st.rerun()
 

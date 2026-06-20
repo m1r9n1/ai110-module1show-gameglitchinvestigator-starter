@@ -27,3 +27,27 @@ def test_string_secret_numeric_comparison():
     outcome, message = check_guess(40, "100")
     assert outcome == "Too Low"
     assert message == "📈 Go HIGHER!"
+
+
+def test_new_game_runtime_resets_status(monkeypatch):
+    # Regression test for: when New Game button is clicked, reset_game_state() should set status back to "playing"
+    # This ensures the player can submit guesses after starting a new game
+    import app
+    from types import SimpleNamespace
+
+    # Create a mock session state that simulates a lost game
+    fake_state = SimpleNamespace(attempts=5, secret=42, status="lost")
+    
+    # Monkey-patch app.st.session_state to use our fake state instead of real Streamlit state
+    monkeypatch.setattr(app.st, "session_state", fake_state)
+    
+    # Monkey-patch random.randint to return a predictable secret (99) instead of random
+    monkeypatch.setattr(app.random, "randint", lambda low, high: 99)
+
+    # Call the reset_game_state() function to simulate clicking "New Game"
+    app.reset_game_state()
+
+    # Verify that the state was properly reset:
+    assert fake_state.attempts == 0  # attempts counter should reset to 0
+    assert fake_state.secret == 99  # secret should be regenerated
+    assert fake_state.status == "playing"  # status must be "playing" so new guesses are accepted
