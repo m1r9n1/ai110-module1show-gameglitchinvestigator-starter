@@ -3,6 +3,11 @@ import streamlit as st
 
 from logic_utils import check_guess
 
+def on_guess_submitted():
+    """Callback function triggered when user presses Enter in the text input."""
+    # FIX: mark that the guess was submitted via Enter in the text input
+    st.session_state.guess_submitted = True
+
 def get_range_for_difficulty(difficulty: str):
     if difficulty == "Easy":
         return 1, 20
@@ -88,6 +93,10 @@ if "status" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
+if "guess_submitted" not in st.session_state:
+    # FIX: initialize the Enter-key submission flag in session state
+    st.session_state.guess_submitted = False
+
 st.subheader("Make a guess")
 
 st.info(
@@ -104,9 +113,11 @@ with st.expander("Developer Debug Info"):
 
 raw_guess = st.text_input(
     "Enter your guess:",
-    key=f"guess_input_{difficulty}"
+    key=f"guess_input_{difficulty}",
+    on_change=on_guess_submitted
 )
 
+# FIX: support Enter-key submission in addition to button click
 col1, col2, col3 = st.columns(3)
 with col1:
     submit = st.button("Submit Guess 🚀")
@@ -128,7 +139,8 @@ if st.session_state.status != "playing":
         st.error("Game over. Start a new game to try again.")
     st.stop()
 
-if submit:
+if submit or st.session_state.guess_submitted:
+    # FIX: process guesses submitted by either button click or Enter key
     st.session_state.attempts += 1
 
     ok, guess_int, err = parse_guess(raw_guess)
@@ -167,6 +179,9 @@ if submit:
                     f"The secret was {st.session_state.secret}. "
                     f"Score: {st.session_state.score}"
                 )
+    
+    # FIX: reset the Enter-key submission flag after processing the guess
+    st.session_state.guess_submitted = False
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")
