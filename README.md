@@ -25,28 +25,44 @@ It wrote the code, ran away, and now the game is unplayable.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+Purpose of the Game
+- The purpose of the game is for the player to guess what the secret number that the Streamlit game generated within a limited number of attempts. The player can select Difficulty, and the goal is to guess correctly using higher/lower hints while tracking score, attempts and guess history. 
 
+Bug detail
+- The first bug was in the guess-evaluation logic inside logic_utils.py (originally in app.py).
+check_guess() was returning the wrong hint text for the comparison result.
+- For example, when the user guessed too low, the app could still show “Go LOWER!” instead of “Go HIGHER!”, and vice versa.
+
+Fixes applied
+- Updated check_guess() so:
+   - guess > secret returns "Too High" and "📉 Go LOWER!"
+   - guess < secret returns "Too Low" and "📈 Go HIGHER!"
+- Made sure the secret number is always turned into a normal integer before checking the guess, so the hint text stays correct every time.
+- Added/verified tests in test_game_logic.py to assert the correct hint messages for both too-high and too-low guesses.
+
+ 
 ## 📸 Demo Walkthrough
 
 Describe your fixed game in numbered steps so a reader can follow along without watching a video:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+1. Player will input first guess (e.g., 50)
+2. Player will then press enter or submit their guess by clicking on button.
+3. Game will show a hint (e.g., "📈 Go HIGHER!" or "📉 Go LOWER!").
+4. Attempts will be incremented.
+5. Score will be updated.
+6. If player does not guess the secret number, player will make another guess.
+7. Continue until player guesses the correct number.
+8. Game shows success(balloons), and displays the final score and set status to won. 
+9. Player can click New Game to start a fresh game.
 
 **Screenshot** *(optional)*: <!-- Insert a screenshot of your fixed, winning game here -->
 
 ## 🧪 Test Results
 
 ```
-# Paste your pytest output here, e.g.:
-# pytest tests/
-# ========================= X passed in 0.XXs =========================
+tests\test_game_logicpy .....                                                                   [100%]
+
+===================================== 5 passed in 1.05s ====================================
 ```
 
 ## 🚀 Stretch Features
